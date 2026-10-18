@@ -3,6 +3,9 @@ const { getModel } = require('../config/gemini');
 
 
 const analyzeReviews = async (req, res) => {
+    if (!process.env.GEMINI_API_KEY) {
+        return res.status(503).json({ message: 'Analyse IA indisponible : aucune cle Gemini configuree.' });
+    }
     try {
         const reviews = await Review.find({
             stadium: req.params.stadiumId,

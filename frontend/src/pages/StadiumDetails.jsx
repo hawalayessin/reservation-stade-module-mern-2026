@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { AuthContext } from "../context/AuthContext";
 import { useParams, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify"; 
 import api from "../api/axios";
@@ -27,7 +28,8 @@ function StadiumDetails() {
   const [aiAnalysis, setAiAnalysis] = useState("");
   const [loadingAI, setLoadingAI] = useState(false);
 
-  const userId = localStorage.getItem("userId");
+  const { user } = useContext(AuthContext);
+  const userId = user?.id;
 
  
   useEffect(() => {
@@ -125,9 +127,12 @@ function StadiumDetails() {
       const res = await api.post(`/ai/analyze-reviews/${id}`);
       setAiAnalysis(res.data.analysis);
       toast.success("Analyse IA terminée");
-    } catch {
-      setAiAnalysis("Erreur lors de l’analyse des avis par l’IA");
-      toast.error("Erreur lors de l’analyse des avis par l’IA");
+    } catch (error) {
+      const message = error.response?.status === 503
+        ? "L’analyse IA est optionnelle et n’est pas activée pour cette démonstration."
+        : "Erreur lors de l’analyse des avis par l’IA";
+      setAiAnalysis(message);
+      toast.info(message);
     } finally {
       setLoadingAI(false);
     }
@@ -142,7 +147,7 @@ function StadiumDetails() {
           <div className="details-card">
             <h2>{stadium.name}</h2>
             <p>
-              <strong>Location :</strong> {stadium.location}
+              <strong>Ville :</strong> {stadium.location}
             </p>
             <p>
               <strong>Type :</strong> {stadium.type}
@@ -158,6 +163,7 @@ function StadiumDetails() {
             {availabilities.length > 0 && (
               <form onSubmit={handleReservation} className="reservation-form">
                 <select
+                  aria-label="Créneau disponible"
                   value={selectedSlot}
                   onChange={(e) => setSelectedSlot(e.target.value)}
                   required

@@ -28,13 +28,13 @@ function Navbar() {
       <ul className="navbar-links">
         <li>
           <Link to="/stadiums" className={isActive("/stadiums")}>
-            Stadiums
+            Terrains
           </Link>
         </li>
 
         <li>
           <Link to="/reservations" className={isActive("/reservations")}>
-            My Reservations
+            Mes réservations
           </Link>
         </li>
 
@@ -42,14 +42,14 @@ function Navbar() {
         {isAdmin && (
           <li>
             <Link to="/admin" className={isActive("/admin")}>
-              Admin
+              Administration
             </Link>
           </li>
         )}
 
         <li>
           <button className="logout-button" onClick={handleLogout}>
-            Logout
+            Déconnexion
           </button>
         </li>
       </ul>
