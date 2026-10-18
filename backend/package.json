@@ -6,7 +6,10 @@
     "start": "node server.js",
     "dev": "node --watch server.js",
     "test": "node --test",
-    "create-admin": "node scripts/create-admin.js"
+    "create-admin": "node scripts/create-admin.js",
+    "demo:seed": "node scripts/seed-demo.js",
+    "demo": "node scripts/start-demo.js",
+    "demo:check": "node scripts/check-demo.js"
   },
   "keywords": [],
   "author": "",

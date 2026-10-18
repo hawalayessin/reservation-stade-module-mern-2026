@@ -5,10 +5,12 @@ const {
   createReview,
   getReviewsByStadium,
   deleteReview,
+  updateReview,
 } = require('../controllers/reviewController');
 
 router.post('/', protect, createReview);
 router.get('/stadium/:stadiumId', getReviewsByStadium);
 router.delete('/:id', protect, deleteReview);
+router.put('/:id', protect, updateReview);
 
 module.exports = router;

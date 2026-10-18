@@ -62,7 +62,7 @@ function Stadiums() {
 
                 <div className="stadium-info">
                   <p>
-                    📍 Location : <span>{stadium.location}</span>
+                    📍 Ville : <span>{stadium.location}</span>
                   </p>
                   <p>
                     🏟️ Type : <span>{stadium.type}</span>
@@ -76,7 +76,7 @@ function Stadiums() {
                   to={`/stadiums/${stadium._id}`}
                   className="stadium-button"
                 >
-                  View Details
+                  Voir les créneaux
                 </Link>
               </div>
             ))}

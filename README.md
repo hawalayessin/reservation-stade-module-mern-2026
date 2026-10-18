@@ -18,6 +18,9 @@ Source: `frontend/` for the interface and `backend/` for routes, controllers and
 
 ## Local setup
 
+For a recruiter walkthrough with isolated fictional data, see [DEMO.md](DEMO.md).
+It includes local startup, generated demo accounts and a three-minute visit.
+
 Use Node.js 22+ and a local MongoDB instance. In `backend/`, copy `.env.example`
 to `.env`, generate a unique JWT secret using the command in the example, and
 set the database URI. A Gemini key is optional and must never be committed.

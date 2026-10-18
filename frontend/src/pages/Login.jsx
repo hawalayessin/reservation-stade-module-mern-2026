@@ -36,14 +36,16 @@ function Login() {
   return (
     <div className="login-container">
       <div className="login-card">
-        <h2>Login</h2>
+        <h2>Connexion</h2>
 
         {error && <p className="login-error">{error}</p>}
 
         <form onSubmit={handleSubmit}>
           <div className="login-group">
-            <label>Email</label>
+            <label htmlFor="login-email">Adresse e-mail</label>
             <input
+              id="login-email"
+              autoComplete="username"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -52,8 +54,10 @@ function Login() {
           </div>
 
           <div className="login-group">
-            <label>Password</label>
+            <label htmlFor="login-password">Mot de passe</label>
             <input
+              id="login-password"
+              autoComplete="current-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -62,7 +66,7 @@ function Login() {
           </div>
 
           <button className="login-button" type="submit">
-            Login
+            Se connecter
           </button>
         </form>
 

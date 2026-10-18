@@ -8,6 +8,8 @@ const Reservation = require('../models/Reservation');
 const authRoutes = require('../routes/authRoutes');
 const stadiumRoutes = require('../routes/stadiumRoutes');
 const reservationRoutes = require('../routes/reservationRoutes');
+const reviewRoutes = require('../routes/reviewRoutes');
+const Review = require('../models/Review');
 
 process.env.JWT_SECRET = 'test-only-secret-not-used-by-any-deployment';
 let server, url, createdUser, admin;
@@ -15,6 +17,7 @@ before(async () => {
   const app = express(); app.use(express.json());
   app.use('/auth', authRoutes); app.use('/stadiums', stadiumRoutes);
   app.use('/reservations', reservationRoutes);
+  app.use('/reviews', reviewRoutes);
   server = await new Promise(resolve => { const s = app.listen(0, '127.0.0.1', () => resolve(s)); });
   url = `http://127.0.0.1:${server.address().port}`;
 });
@@ -69,4 +72,19 @@ test('failed persistence releases a claimed slot', async () => {
   Reservation.create=async()=>{throw new Error('Database unavailable');};
   assert.equal((await request('/reservations',{stadium:'stadium',availability:'slot'})).status,500);
   assert.equal(released,true);
+});
+
+test('another account cannot edit a review', async () => {
+  Review.findById = async () => ({ user: 'owner', save: async () => assert.fail('must not save') });
+  assert.equal((await request('/reviews/review', { rating: 1, comment: 'overwrite' }, 'other', 'PUT')).status, 403);
+});
+
+test('editing a review preserves ownership and stadium', async () => {
+  const review = { user: 'owner', stadium: 'original', rating: 4, comment: 'before', save: async () => {} };
+  Review.findById = async () => review;
+  const response = await request('/reviews/review', { rating: 5, comment: 'after', user: 'other', stadium: 'other' }, 'owner', 'PUT');
+  assert.equal(response.status, 200);
+  const body = await response.json();
+  assert.equal(body.user, 'owner'); assert.equal(body.stadium, 'original');
+  assert.equal(body.rating, 5); assert.equal(body.comment, 'after');
 });

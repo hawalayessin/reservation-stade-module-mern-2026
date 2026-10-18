@@ -132,7 +132,7 @@ function AdminDashboard() {
       <Navbar />
 
       <div className="admin-container">
-        <h1>Admin Dashboard</h1>
+        <h1>Administration</h1>
 
         <section className="admin-section">
           <h2>Gestion des stades</h2>
@@ -147,7 +147,7 @@ function AdminDashboard() {
               required
             />
             <input
-              placeholder="Location"
+              placeholder="Ville"
               value={stadiumForm.location}
               onChange={(e) =>
                 setStadiumForm({ ...stadiumForm, location: e.target.value })
