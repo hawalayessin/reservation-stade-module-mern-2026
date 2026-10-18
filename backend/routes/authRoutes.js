@@ -6,7 +6,7 @@ const User = require('../models/User');
 
 router.post('/register', async (req, res) => {
   try {
-    const { username, email, password, isAdmin } = req.body;
+    const { username, email, password } = req.body;
 
     const userExists = await User.findOne({ email });
     if (userExists) {
@@ -19,7 +19,7 @@ router.post('/register', async (req, res) => {
       username,
       email,
       password: hashedPassword,
-      isAdmin: isAdmin === true,
+      isAdmin: false,
     });
 
     const token = jwt.sign(

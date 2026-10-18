@@ -1,206 +1,72 @@
-🏟️ Stadium Reservation System (MERN Stack)
-📌 Description du projet
+# Stadium Reservation System
 
-Ce projet est une application web de réservation de stades sportifs développée en MERN Stack (MongoDB, Express, React, Node.js).
-Elle permet aux utilisateurs de consulter les stades, réserver des créneaux horaires disponibles, laisser des avis, et bénéficier d’une analyse intelligente des avis via IA (Gemini).
+Academic full-stack project for booking sports facilities, with a React frontend,
+an Express API, MongoDB persistence and optional Gemini review summaries.
 
-Une interface Admin est également disponible pour gérer les stades et les créneaux (availability).
+## Features
 
-Ce projet a été réalisé en respectant les TP du module MERN / Web avancé.
+- User registration and JWT authentication.
+- Available slots, reservations and owner-only cancellation.
+- Administrator-only stadium and availability management.
+- Reviews and optional AI-generated summaries.
 
-🎯 Objectifs pédagogiques (alignés avec les TP)
+## Architecture
 
-Architecture Client / Serveur
+`React / Vite -> Express REST API -> MongoDB` (Gemini is called by the backend.)
 
-API REST sécurisée avec JWT
+Source: `frontend/` for the interface and `backend/` for routes, controllers and models.
 
-Gestion de l’authentification et des rôles
+## Local setup
 
-Manipulation des hooks React
+Use Node.js 22+ and a local MongoDB instance. In `backend/`, copy `.env.example`
+to `.env`, generate a unique JWT secret using the command in the example, and
+set the database URI. A Gemini key is optional and must never be committed.
 
-Utilisation de useReducer et useContext
-
-CRUD complet (Stadium, Availability, Reservation, Review)
-
-Intégration d’une API d’IA (Gemini)
-
-Bonnes pratiques frontend / backend
-
-🧱 Architecture générale
-Frontend (React + Vite)
-│
-│── Pages (Login, Register, Stadiums, StadiumDetails, Reservations, AdminDashboard)
-│── Components (Navbar, ProtectedRoute, AdminRoute)
-│── Context (AuthContext, authReducer)
-│── API (Axios instance)
-│
-Backend (Node.js + Express)
-│
-│── Routes (auth, stadiums, availabilities, reservations, reviews, ai)
-│── Controllers
-│── Models (User, Stadium, Availability, Reservation, Review)
-│── Middleware (authMiddleware)
-│── MongoDB
-│
-IA
-│── Google Gemini API (analyse des avis)
-
-🔐 Authentification & Sécurité
-
-Authentification via JWT
-
-Middleware protect pour sécuriser les routes
-
-Rôles utilisateurs :
-
-User : réservation, avis
-
-Admin : gestion stades & créneaux
-
-Routes protégées côté frontend (ProtectedRoute, AdminRoute)
-
-Gestion globale de l’auth via useReducer + Context
-
-🧑‍💻 Fonctionnalités
-👤 Utilisateur
-
-Inscription / Connexion
-
-Consultation des stades
-
-Réservation d’un créneau disponible
-
-Annulation de réservation
-
-Ajout / modification / suppression d’avis
-
-Analyse intelligente des avis via IA
-
-🛠️ Administrateur
-
-Création / modification / suppression de stades
-
-Gestion des créneaux (Availability)
-
-Visualisation du statut :
-
-🟢 Disponible
-
-🔴 Réservé
-
-Gestion complète même des créneaux déjà réservés
-
-🤖 Intelligence Artificielle (Gemini)
-
-Analyse automatique des avis d’un stade
-
-Résumé clair et structuré :
-
-Tendance générale
-
-Note moyenne
-
-Points positifs / négatifs
-
-Intégration via une API backend dédiée (/api/ai/analyze-reviews/:stadiumId)
-
-⚙️ Technologies utilisées
-Frontend
-
-React (Vite)
-
-React Router DOM
-
-Axios
-
-React Toastify
-
-CSS pur (sans framework)
-
-Backend
-
-Node.js
-
-Express.js
-
-MongoDB + Mongoose
-
-JWT
-
-Bcrypt.js
-
-IA
-
-Google Generative AI (Gemini)
-
-📂 Structure du projet
-backend/
-│── controllers/
-│── models/
-│── routes/
-│── middleware/
-│── config/
-│── server.js
-
-frontend/
-│── src/
-│   │── pages/
-│   │── components/
-│   │── context/
-│   │── api/
-│   │── App.jsx
-│   │── main.jsx
-
-🔁 Hooks React utilisés
-
-useState
-
-useEffect
-
-useContext
-
-useReducer
-
-useNavigate
-
-useParams
-
-useLocation
-
-🌐 Utilisation d’Axios
-
-Instance Axios centralisée
-
-Intercepteur pour ajouter automatiquement le token JWT
-
-Appels API clairs et sécurisés
-
-🚀 Lancement du projet
-Backend
+```sh
 cd backend
-npm install
+npm ci
 npm run dev
+```
 
-Frontend
+In another terminal:
+
+```sh
 cd frontend
-npm install
+npm ci
 npm run dev
+```
 
-🧪 Tests
+The interface runs on http://localhost:5173 and the API defaults to port 5000.
 
-Tests API via Postman
+## Administration
 
-Création d’admin via /auth/register
+Public registration always creates an ordinary account. To bootstrap an admin,
+set `ADMIN_EMAIL`, `ADMIN_USERNAME` and `ADMIN_PASSWORD` (12+ characters) in your
+local shell, then run `npm run create-admin` from `backend/`. This refuses to
+promote an existing account. Clear the bootstrap variables afterwards.
 
-Tests CRUD sur Stadium / Availability / Reservation / Review
+## Verification
 
+```sh
+cd backend
+npm test
+```
 
+The regression suite exercises public registration, role checks, reservation
+ownership and concurrent slot claims through HTTP, with isolated model doubles.
+It does not replace integration testing against MongoDB. Frontend build:
+`cd frontend && npm run build`. Both checks also run in GitHub Actions.
 
-✅ Architecture MERN
-✅ Authentification JWT
-✅ CRUD complet
-✅ Hooks React
-✅ useReducer / Context
-✅ Séparation Front / Back
-✅ Bonus IA (au-delà du TP)
+## Limitations and deployment
 
+This is an academic project, not a claim of production certification. Slot claims
+are atomic, but the claim and reservation insert are separate writes; an abrupt
+process termination between them can leave a slot locked. A production deployment
+should use a MongoDB transaction on a replica set or add reconciliation.
+
+Previously published credentials must be revoked/replaced; removing a file does
+not invalidate its old values or erase Git history. Only `.env.example` belongs
+in the repository. Configure HTTPS, restricted CORS, rate limiting and monitoring
+before any public deployment. Use synthetic accounts and data for demonstrations.
+
+Author: [Yassine Ben Hawala](https://portfoliohawala.vercel.app/).
