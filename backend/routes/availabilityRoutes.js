@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { protect } = require('../middleware/authMiddleware');
+const { protect, adminOnly } = require('../middleware/authMiddleware');
 
 const {
   createAvailability,
@@ -10,9 +10,9 @@ const {
   deleteAvailability,
 } = require('../controllers/availabilityController');
 
-router.post('/', protect, createAvailability);
+router.post('/', protect, adminOnly, createAvailability);
 router.get('/stadium/:stadiumId', getAvailabilityByStadium);
-router.put('/:id', protect, updateAvailability);
-router.delete('/:id', protect, deleteAvailability);
-router.get('/admin/stadium/:stadiumId', protect, getAllAvailabilityByStadium);
+router.put('/:id', protect, adminOnly, updateAvailability);
+router.delete('/:id', protect, adminOnly, deleteAvailability);
+router.get('/admin/stadium/:stadiumId', protect, adminOnly, getAllAvailabilityByStadium);
 module.exports = router;

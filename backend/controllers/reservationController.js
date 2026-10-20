@@ -3,46 +3,36 @@ const Availability = require('../models/Availability');
 
 
 const createReservation = async (req, res) => {
+  let claimedSlot;
+  let reservation;
   try {
     const { stadium, availability } = req.body;
-
-
-    if (!availability) {
-      return res.status(400).json({
-        message: 'Availability is required',
-      });
+    if (!stadium || !availability) {
+      return res.status(400).json({ message: 'Stadium and availability are required' });
     }
-
- 
-    const slot = await Availability.findById(availability);
-
-    if (!slot) {
-      return res.status(404).json({
-        message: 'Créneau introuvable',
-      });
+    // A single atomic write selects the winner when requests race for a slot.
+    claimedSlot = await Availability.findOneAndUpdate(
+      { _id: availability, stadium, isAvailable: true },
+      { $set: { isAvailable: false } },
+      { new: true }
+    );
+    if (!claimedSlot) {
+      return res.status(409).json({ message: 'Slot unavailable for this stadium' });
     }
-
-    if (!slot.isAvailable) {
-      return res.status(400).json({
-        message: 'Créneau déjà réservé',
-      });
-    }
-
-    const reservation = await Reservation.create({
-      user: req.userId,
-      stadium,
-      availability,
-      startTime: slot.startTime,
-      endTime: slot.endTime,
+    reservation = await Reservation.create({
+      user: req.userId, stadium: claimedSlot.stadium, availability: claimedSlot._id,
+      startTime: claimedSlot.startTime, endTime: claimedSlot.endTime,
     });
-
-    slot.isAvailable = false;
-    await slot.save();
-
-    res.status(201).json(reservation);
+    return res.status(201).json(reservation);
   } catch (error) {
-    console.error('Reservation error:', error);
-    res.status(500).json({ message: error.message });
+    if (claimedSlot && !reservation) {
+      try {
+        await Availability.findByIdAndUpdate(claimedSlot._id, { $set: { isAvailable: true } });
+      } catch (rollbackError) {
+        console.error('Slot rollback failed:', rollbackError.message);
+      }
+    }
+    return res.status(500).json({ message: 'Unable to create reservation' });
   }
 };
 
@@ -73,6 +63,9 @@ const getReservationById = async (req, res) => {
       });
     }
 
+    if (String(reservation.user) !== req.userId) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
     res.json(reservation);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -90,8 +83,8 @@ const deleteReservation = async (req, res) => {
       });
     }
 
-    if (reservation.user.toString() !== req.userId) {
-      return res.status(401).json({
+    if (String(reservation.user) !== req.userId) {
+      return res.status(403).json({
         message: 'Not authorized',
       });
     }

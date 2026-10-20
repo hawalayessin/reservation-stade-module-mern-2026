@@ -5,6 +5,10 @@ const connectDB = require('./config/db');
 
 dotenv.config();
 
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
+  throw new Error("Set JWT_SECRET to a new random value of at least 32 characters.");
+}
+
 const app = express();
 
 
